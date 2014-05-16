@@ -788,6 +788,30 @@ pre code {
   margin-left: auto;
 }
 
+.comments {
+	list-style: none;
+	width: 100%;
+}
+
+.addComment {
+	margin: 20px 0;
+	width: 100%;
+}
+
+.comments ul {
+	width: 100%;
+	padding: 0;
+}
+.comments ul li:first-child {
+	margin-left: 0px;
+}
+
+.comments ul li{
+	display: inline-block;
+	margin-left: 10px;
+	min-width: 20%;
+}
+
 .container:before,
 .container:after {
   display: table;
@@ -1925,6 +1949,19 @@ output {
   line-height: 1.428571429;
   color: #555555;
   vertical-align: middle;
+}
+
+form input,
+form label,
+form textarea {
+	display: block;
+}
+
+form ul {
+	color: red;
+	list-style: none;
+	padding: 0;
+
 }
 
 .form-control {

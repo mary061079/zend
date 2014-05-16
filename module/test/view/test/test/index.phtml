@@ -1,0 +1,25 @@
+<?php
+$title = 'My Comments';
+$this->headTitle( $title );
+?>
+<h1><?php echo $this->escapeHtml( $title ); ?></h1>
+<ul class="comments">
+	<li class="addComment">
+		<a href="<?php echo $this->url( 'test', array( 'action' => 'add' ) )?>"><?php echo $this->translate('Add new comment')?></a>
+	</li>
+	<?php
+	foreach( $comments as $comment ) {?>
+		<li>
+			<ul>
+				<li><?php echo $comment->email; ?></li>
+				<li><?php echo $comment->comment; ?></li>
+				<li>
+					<a href="<?php echo $this->url( 'test', array( 'action' => 'edit', 'id' => $comment->id ) )?>"><?php echo $this->translate('Edit new comment')?></a>
+				</li>
+				<li>
+					<a href="<?php echo $this->url( 'test', array( 'action' => 'delete', 'id' => $comment->id ) )?>"><?php echo $this->translate('Delete new comment')?></a>
+				</li>
+			</ul>
+		</li>
+	<?php } ?>
+</ul>

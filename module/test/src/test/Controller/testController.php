@@ -6,16 +6,115 @@
  * @copyright Copyright (c) 2005-2014 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd New BSD License
  */
-
 namespace test\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
+use test\Model\fetchData;
+use test\Form\testForm;
 
 class testController extends AbstractActionController
 {
-    public function testAction()
+	protected $commentsData;
+    public function indexAction()
     {
-        return new ViewModel();
+        return new ViewModel(
+	        array(
+		        'comments' => $this->getCommentsData()->fetchAll()
+	        )
+        );
     }
+
+	public function addAction() {
+		// Here we use the class we wrote from module/test/src/test/Form/testForm.php
+
+		$form = new testForm();
+
+		// Setting value on Submit button
+		$form->get('submit')->setAttribute( 'value', 'Add' );
+		// getting request, method of AbstractActionController class
+		$request = $this->getRequest();
+		if ( $request->isPost() ) {
+			$comment = new fetchData();
+			$form->setInputFilter( $comment->getInputFilter() );
+			$form->setData( $request->getPost() );
+
+			if ( $form->isValid() ) {
+				$comment->exchangeArray( $form->getData() );
+				$this->getCommentsData()->saveComment( $comment );
+
+				//redirecting back to the list of albums
+				$this->redirect()->toRoute( 'test' );
+			}
+		}
+		//setting the output array
+		return array( 'form' => $form );
+	}
+
+	public function editAction() {
+		//the url is kind of /test/edit/4
+		//getting the params; 0 - number of parameter from the end
+		$id = (int) $this->params()->fromRoute('id', 0);
+		//if id doesn't exist, redirect it to /add page
+		if (!$id) {
+			return $this->redirect()->toRoute('album', array(
+				'action' => 'add'
+			));
+		}
+		try {
+			$comment = $this->getCommentsData()->getComment( $id );
+		} catch ( \Exception $e ) {
+			// how to set query parameters for url string
+			return $this->redirect()->toRoute(
+	                'test',
+	                array(
+						'action' => 'index'
+					),
+					array(
+						'query' => array( 'edited' => '1' )
+				)
+			);
+		}
+		$form = new testForm();
+
+		// Setting value on Submit button
+		$form->get('submit')->setAttribute( 'value', 'Edit' );
+		//this function fills all fields with the comment data
+		$form->bind( $comment );
+
+		$request = $this->getRequest();
+		if ( $request->isPost() ) {
+			$comment = new fetchData();
+			$form->setInputFilter( $comment->getInputFilter() );
+			$form->setData( $request->getPost() );
+
+			if ( $form->isValid() ) {
+				$comment->exchangeArray( $form->getData() );
+				$this->getCommentsData()->saveComment( $comment );
+
+				//redirecting back to the list of albums
+				$this->redirect()->toRoute( 'test' );
+			}
+		}
+		//setting the output array
+		//just in case also return our $id
+		return array(
+			'form' => $form,
+			'id' => $id
+		);
+	}
+
+	public function deleteAction() {
+
+
+	}
+
+	public function getCommentsData()
+	{
+		if ( !$this->commentsData ) {
+			$sm = $this->getServiceLocator();
+			$this->commentsData = $sm->get( 'test\Model\CommentsData' );
+		}
+		return $this->commentsData;
+	}
 }

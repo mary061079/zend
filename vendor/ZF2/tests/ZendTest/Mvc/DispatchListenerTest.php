@@ -140,7 +140,6 @@ class DispatchListenerTest extends TestCase
         $event = $this->application->getMvcEvent();
         $dispatchListener = $this->serviceManager->get('DispatchListener');
         $return = $dispatchListener->onDispatch($event);
-
         $this->assertArrayHasKey('error', $log);
         $this->assertSame('error-controller-not-found', $log['error']);
     }
