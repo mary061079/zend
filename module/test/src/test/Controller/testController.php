@@ -57,12 +57,13 @@ class testController extends AbstractActionController
 		$id = (int) $this->params()->fromRoute('id', 0);
 		//if id doesn't exist, redirect it to /add page
 		if (!$id) {
-			return $this->redirect()->toRoute('album', array(
+			return $this->redirect()->toRoute('test', array(
 				'action' => 'add'
 			));
 		}
 		try {
 			$comment = $this->getCommentsData()->getComment( $id );
+
 		} catch ( \Exception $e ) {
 			// how to set query parameters for url string
 			return $this->redirect()->toRoute(
@@ -71,7 +72,7 @@ class testController extends AbstractActionController
 						'action' => 'index'
 					),
 					array(
-						'query' => array( 'edited' => '1' )
+						'query' => array( 'edited' => 'false' )
 				)
 			);
 		}
@@ -84,12 +85,15 @@ class testController extends AbstractActionController
 
 		$request = $this->getRequest();
 		if ( $request->isPost() ) {
-			$comment = new fetchData();
 			$form->setInputFilter( $comment->getInputFilter() );
 			$form->setData( $request->getPost() );
 
 			if ( $form->isValid() ) {
-				$comment->exchangeArray( $form->getData() );
+//				var_dump($comment );die;
+				/**
+				 * !!!! ATTENTION !!!
+				 * we are using here data from getCommenta and not new instance of fetchData
+				 */
 				$this->getCommentsData()->saveComment( $comment );
 
 				//redirecting back to the list of albums

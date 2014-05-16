@@ -68,7 +68,9 @@ class CommentsData {
 			} catch ( \Exception $e ) {
 				throw new \Exception( $e->getMessage() );
 			}
-			$this->tableGateway->update( $data );
+			$this->tableGateway->update( $data, array(
+				'id' => $comment_id
+			) );
 		}
 	}
 
