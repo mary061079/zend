@@ -35,12 +35,11 @@ return array(
             'routes' => array(
                 'esbulkactions' => array(
                     'options' => array(
-                        'route' => 'esbulkactions (add|update|delete):mode',
-                        //'action' => '(add|update|delete):mode',
-                    ),
-                    'defaults' => array(
-                        'controller' => 'ElasticSearch\Controller\BulkActions',
-                        'action' => 'update'
+                        'route' => 'esbulkactions [add|update|delete]:mode',
+                        'defaults' => array(
+                            'controller' => 'ElasticSearch\Controller\BulkActions',
+                            'action' => 'update'
+                        )
                     )
                 )
             )

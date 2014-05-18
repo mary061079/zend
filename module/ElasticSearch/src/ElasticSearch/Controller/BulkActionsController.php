@@ -9,16 +9,15 @@
 namespace ElasticSearch\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
+use ElasticSearch\Model\BulkActions;
 use Zend\Console\Request as ConsoleRequest;
 
 
 class BulkActionsController extends AbstractActionController {
 
     public function updateAction() {
-        //$request = $this->getRequest();
-        var_dump('sdfdsfs');
-        return new ViewModel();
+        $request = $this->getRequest();
+        var_dump($request);
     }
 
     public function addAction() {

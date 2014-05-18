@@ -33,7 +33,20 @@ class Module{
                 'ElasticSearch\Model\SearchResults' => function( $sm ) {
                         return $sm->get( 'SearchResults' );
                     },
-                )
+                'ESTableGateway' => function( $sm ) {
+                        $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
+                        $resultSetPrototype = new ResultSet();
+                        $resultSetPrototype->setArrayObjectPrototype( new fetchData() );
+                        /**
+                         * 'comments' is a name of the table for my module
+                         */
+                        return new TableGateway( 'comments', $dbAdapter, null, $resultSetPrototype);
+                    },
+                'ElasticSearch\Model\BulkActions' => function( $sm ) {
+                        $ESTableGateway = $sm->get( 'ESTableGateway' );
+                        return new BulkActions( $ESTableGateway );
+                    },
+                ),
         );
     }
 }
