@@ -89,7 +89,6 @@ class testController extends AbstractActionController
 			$form->setData( $request->getPost() );
 
 			if ( $form->isValid() ) {
-//				var_dump($comment );die;
 				/**
 				 * !!!! ATTENTION !!!
 				 * we are using here data from getCommenta and not new instance of fetchData
@@ -113,8 +112,7 @@ class testController extends AbstractActionController
 
 	}
 
-	public function getCommentsData()
-	{
+	public function getCommentsData() {
 		if ( !$this->commentsData ) {
 			$sm = $this->getServiceLocator();
 			$this->commentsData = $sm->get( 'test\Model\CommentsData' );

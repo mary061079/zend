@@ -56,7 +56,8 @@ class CommentsData {
 		$data = array(
 			'email' => $comment->email,
 			'comment' => $comment->comment,
-		    'created' => 'NOW()'
+		    'created' => date( 'Y-m-d H:i:s' ),
+		    'updated' => date( 'Y-m-d H:i:s' )
 		);
 		/** @var if we want to update, we give the function an object with $id*/
 		$comment_id = (int)$comment->id;

@@ -21,7 +21,8 @@ class fetchData implements InputFilterAwareInterface {
 		$this->id = ( !empty( $data['id'] ) ) ? $data['id'] : null;
 		$this->email = ( !empty( $data['email'] ) ) ? $data['email'] : null;
 		$this->comment = ( !empty( $data['comment'] ) ) ? $data['comment'] : null;
-		$this->date = ( !empty( $data['created'] ) ) ? $data['created'] : null;
+		$this->created = ( !empty( $data['created'] ) ) ? $data['created'] : null;
+		$this->updated = ( !empty( $data['updated'] ) ) ? $data['updated'] : date( 'Y-m-d H:i:s' );
 	}
 
 	/**
