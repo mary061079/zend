@@ -35,17 +35,19 @@ class Module{
                     },
                 'ESTableGateway' => function( $sm ) {
                         $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
-                        $resultSetPrototype = new ResultSet();
-                        $resultSetPrototype->setArrayObjectPrototype( new fetchData() );
                         /**
                          * 'comments' is a name of the table for my module
                          */
-                        return new TableGateway( 'comments', $dbAdapter, null, $resultSetPrototype);
+                        return new TableGateway( 'comments', $dbAdapter );
+                    },
+                'ElasticSearch\Model\DBMethods' => function( $sm ) {
+                        $ESTableGateway = $sm->get( 'ESTableGateway' );
+                        return new DBMethods( $ESTableGateway );
                     },
                 'ElasticSearch\Model\BulkActions' => function( $sm ) {
-                        $ESTableGateway = $sm->get( 'ESTableGateway' );
-                        return new BulkActions( $ESTableGateway );
-                    },
+		                $DBMethods = $sm->get( 'ElasticSearch\Model\DBMethods' );
+		                return new BulkActions( $DBMethods );
+	                },
                 ),
         );
     }

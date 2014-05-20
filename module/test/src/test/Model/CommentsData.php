@@ -69,6 +69,7 @@ class CommentsData {
 			} catch ( \Exception $e ) {
 				throw new \Exception( $e->getMessage() );
 			}
+			unset($data['created']);
 			$this->tableGateway->update( $data, array(
 				'id' => $comment_id
 			) );

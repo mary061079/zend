@@ -10,6 +10,7 @@ namespace ElasticSearch\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController;
 use ElasticSearch\Model\BulkActions;
+use ElasticSearch\Model\DBMethods;
 use Zend\Console\Request as ConsoleRequest;
 
 
