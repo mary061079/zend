@@ -2,13 +2,16 @@
 namespace ElasticSearch\Model;
 
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Sql;
 use Zend\I18n\Translator\Translator;
 
 class DBMethods {
-	protected $tableGateway, $translator, $cache;
-    public function __construct( ESTableGateway $ESTableGateway ) {
+	protected $tableGateway, $translator, $cache, $sql;
+    public function __construct( TableGateway $ESTableGateway ) {
 	    $translator = new Translator();
         $this->tableGateway = $ESTableGateway;
+        $this->sql = new Sql($this->tableGateway->adapter);
+
 	    $this->tableGateway->adapter->query(
             "CREATE TABLE IF NOT EXISTS `options` (
 			`id` INT(11) NOT NULL AUTO_INCREMENT,
@@ -17,7 +20,6 @@ class DBMethods {
 			`date` DATETIME NOT NULL,
 			PRIMARY KEY (`id`),
 			INDEX `option_name` (`option_name`),
-			FULLTEXT INDEX `option_value` (`option_value`)
 			)
 			COLLATE='utf8_bin'
 			ENGINE=InnoDB;"
@@ -42,7 +44,12 @@ class DBMethods {
     public function getLatestComments() {
 	    $cron_info = $this->getCronInfo();
 	    $last_id_added =  count( $cron_info ) ? $cron_info->cron_value : 0;
-	    $comments = $this->tableGateway->select( 'where id > ' . $last_id_added );
+        $select = $this->sql->select();
+        $select->from($this->tableGateway->table);
+        $select->where->greaterThan( 'id', $last_id_added );
+        $statement = $this->sql->prepareStatementForSqlObject($select);
+        $comments = $statement->execute();
+
         if ( !$comments ) {
             throw new \Exception( $this->translator->translate( 'No comments found' ) );
         }
@@ -76,12 +83,17 @@ class DBMethods {
 	 * Getting info about last run of the cronjob
 	 */
 	private function getCronInfo() {
-		$last_updated = $this->tableGateway->select( array( 'cron_name' => 'es_cron' ) )
-			->from( array( 'c' => 'cron' ) );
-		$cron_info = $last_updated->current();
-		if ( $cron_info ) {
-			return $cron_info;
-		}
-		return false;
+        $sql = new Sql($this->tableGateway->adapter);
+        $select = $sql->select();
+        $select->from( 'cron' );
+        $select->columns( array( 'cron_value' ) );
+        $select->where->equalTo( 'cron_name', 'es_cron' ) ;
+        $statement = $sql->prepareStatementForSqlObject($select);
+        try {
+            $result = $statement->execute();
+        } catch( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+        return $result;
 	}
 }

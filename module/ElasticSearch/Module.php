@@ -1,8 +1,12 @@
 <?php
 // module/ElasticSearch/Module.php
+// run elasticsearch   /install/elasticsearch-0.19.0.RC1/bin/elasticsearch -f
+
 namespace ElasticSearch;
 use ElasticSearch\Model\ElasticSearchForm;
 use ElasticSearch\Model\SearchResults;
+use ElasticSearch\Model\DBMethods;
+use Zend\Db\TableGateway\TableGateway;
 use ElasticSearch\Model\BulkActions;
 
 
@@ -33,7 +37,7 @@ class Module{
                 'ElasticSearch\Model\SearchResults' => function( $sm ) {
                         return $sm->get( 'SearchResults' );
                     },
-                'ESTableGateway' => function( $sm ) {
+                'TableGateway' => function( $sm ) {
                         $dbAdapter = $sm->get('Zend\Db\Adapter\Adapter');
                         /**
                          * 'comments' is a name of the table for my module
@@ -41,7 +45,7 @@ class Module{
                         return new TableGateway( 'comments', $dbAdapter );
                     },
                 'ElasticSearch\Model\DBMethods' => function( $sm ) {
-                        $ESTableGateway = $sm->get( 'ESTableGateway' );
+                        $ESTableGateway = $sm->get( 'TableGateway' );
                         return new DBMethods( $ESTableGateway );
                     },
                 'ElasticSearch\Model\BulkActions' => function( $sm ) {

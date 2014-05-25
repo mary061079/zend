@@ -29,16 +29,17 @@ return array(
      * php /var/www/zend/public/index.php esbulkactions add
      * php /var/www/zend/public/index.php esbulkactions update
      * php /var/www/zend/public/index.php esbulkactions delete
+     * php /var/www/zend/public/index.php esbulkactions bulk-insert
      */
     'console' => array(
         'router' => array(
             'routes' => array(
                 'esbulkactions' => array(
                     'options' => array(
-                        'route' => 'esbulkactions [add|update|delete]:mode',
+                        'route' => 'esbulkactions [update|delete]:mode',
                         'defaults' => array(
                             'controller' => 'ElasticSearch\Controller\BulkActions',
-                            'action' => 'update'
+                            'action' => 'index'
                         )
                     )
                 )
