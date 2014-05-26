@@ -6,7 +6,7 @@ use Zend\Db\Sql\Sql;
 use Zend\I18n\Translator\Translator;
 
 class DBMethods {
-	protected $tableGateway, $translator, $cache, $sql;
+	public $tableGateway, $translator, $cache, $sql;
     public function __construct( TableGateway $ESTableGateway ) {
 	    $translator = new Translator();
         $this->tableGateway = $ESTableGateway;
@@ -46,10 +46,10 @@ class DBMethods {
 	    $last_id_added =  count( $cron_info ) ? $cron_info->cron_value : 0;
         $select = $this->sql->select();
         $select->from($this->tableGateway->table);
+
         $select->where->greaterThan( 'id', $last_id_added );
         $statement = $this->sql->prepareStatementForSqlObject($select);
         $comments = $statement->execute();
-
         if ( !$comments ) {
             throw new \Exception( $this->translator->translate( 'No comments found' ) );
         }
@@ -62,8 +62,13 @@ class DBMethods {
 	public function getUpdatedComments() {
 		$cron_info = $this->getCronInfo();
 		$cron_date =  $cron_info ? $cron_info->date : date( 'Y-m-d H:i:s' );
-		$comments = $this->tableGateway->select( array( 'where updated > ' . $cron_date ) );
-		if ( !$comments ) {
+		$select = $this->sql->select()
+        ->from($this->tableGateway->table)
+        ->where->greaterThan( 'updated', $cron_date );
+        $statement = $this->sql->prepareStatementForSqlObject($select);
+        $comments = $statement->execute();
+
+        if ( !$comments ) {
 			throw new \Exception( $this->translator->translate( 'No new comments found' ) );
 		}
 		return $comments;
@@ -82,11 +87,11 @@ class DBMethods {
 	/**
 	 * Getting info about last run of the cronjob
 	 */
-	private function getCronInfo() {
+	public function getCronInfo() {
         $sql = new Sql($this->tableGateway->adapter);
         $select = $sql->select();
         $select->from( 'cron' );
-        $select->columns( array( 'cron_value' ) );
+        $select->columns( array( 'cron_value', 'date' ) );
         $select->where->equalTo( 'cron_name', 'es_cron' ) ;
         $statement = $sql->prepareStatementForSqlObject($select);
         try {

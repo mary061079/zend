@@ -25,7 +25,7 @@ class BulkActionsController extends AbstractActionController {
         $request = $this->getRequest();
         $mode = $request->getParam( 'mode' );
         switch( $mode ) {
-            case 'add':
+            case 'update':
                 $this->updateRecords();
 
             case 'delete':
@@ -37,7 +37,11 @@ class BulkActionsController extends AbstractActionController {
     }
 
     public function updateRecords() {
-        $request = $this->getRequest();
+        try {
+            $this->esActions()->bulkUpdate();
+        } catch( \Exception $e ) {
+            $this->log_info( $e->getMessage() );
+        };
     }
 
     public function deleteRecords() {
