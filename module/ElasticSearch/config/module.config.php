@@ -29,7 +29,6 @@ return array(
      * php /var/www/zend/public/index.php esbulkactions add
      * php /var/www/zend/public/index.php esbulkactions update
      * php /var/www/zend/public/index.php esbulkactions delete
-     * php /var/www/zend/public/index.php esbulkactions bulk-insert
      */
     'console' => array(
         'router' => array(

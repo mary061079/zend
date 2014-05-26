@@ -30,7 +30,7 @@ class BulkActions {
 
         $client = new Client( 'http://zend:9200/_bulk');
         $client->setMethod('POST');
-        //url http://zend:9200/zend/comment/1
+
         $client->setRawBody($json);
         $client->setHeaders(
             array(
@@ -39,7 +39,8 @@ class BulkActions {
         );
         $client->setAdapter(new Curl());
         $client->send();
-        var_dump($client->getResponse());
+		//url http://zend:9200/zend/comment/1
+        var_dump($client->isSuccess(),$client->getResponse());
 	}
 
 } 
