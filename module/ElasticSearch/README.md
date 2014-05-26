@@ -1,6 +1,7 @@
 ###Structure of the Database
 
-`CREATE TABLE `comments` (
+ <pre>
+ CREATE TABLE `comments` (
  	`id` INT(11) NOT NULL AUTO_INCREMENT,
  	`author` INT(11) NOT NULL,
  	`comment` TEXT NULL,
@@ -11,9 +12,11 @@
  	INDEX `created` (`created`)
  )
  COLLATE='latin1_swedish_ci'
- ENGINE=InnoDB;`
+ ENGINE=InnoDB;
+  </pre>
 
- `CREATE TABLE `cron` (
+ <pre>
+ CREATE TABLE `cron` (
   	`id` INT(11) NOT NULL AUTO_INCREMENT,
   	`cron_name` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8_bin',
   	`cron_value` VARCHAR(250) NOT NULL DEFAULT '0' COLLATE 'utf8_bin',
@@ -24,7 +27,8 @@
   	INDEX `date` (`date`)
   )
   COLLATE='utf8_bin'
-  ENGINE=InnoDB;`
+  ENGINE=InnoDB;
+   </pre>
 
 
 
