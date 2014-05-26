@@ -15,11 +15,11 @@ use Zend\Console\Request as ConsoleRequest;
 
 
 class BulkActionsController extends AbstractActionController {
-    protected $esActions;
+    protected $esActions, $log_file;
 
-//    public function __construct( DBMethods $dbMethods ) {
-//        $this->esActions = $this->esActions();
-//    }
+    public function __construct() {
+        $this->log_file = '/path/to/file';
+    }
 
     public function indexAction() {
         $request = $this->getRequest();
@@ -45,14 +45,28 @@ class BulkActionsController extends AbstractActionController {
     }
 
     public function bulkInsert() {
-        $this->esActions()->bulkInsert();
+        try {
+	        $this->esActions()->bulkInsert();
+        } catch( \Exception $e ) {
+	        $this->log_info( $e->getMessage() );
+        };
     }
 
     public function esActions() {
         if ( !$this->esActions ) {
             $sm = $this->getServiceLocator();
             $this->esActions = $sm->get( 'ElasticSearch\Model\BulkActions' );
-        }
+	    }
         return $this->esActions;
     }
+
+	public function log_info( $info ) {
+		echo  date( 'Y-m-d H:i:s' ) . "\n".$info; die;
+		if ( strlen( $info ) > 0 ) {
+			$f = fopen( $this->log_file, 'a' );
+			$date = date( 'Y-m-d H:i:s' ) . "\n";
+			fwrite( $f, $date . $info . "\n" );
+			fclose( $f );
+		}
+	}
 }

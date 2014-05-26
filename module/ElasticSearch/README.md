@@ -11,7 +11,7 @@
  	INDEX `updated` (`updated`),
  	INDEX `created` (`created`)
  )
- COLLATE='latin1_swedish_ci'
+ COLLATE='utf8_bin'
  ENGINE=InnoDB;
   </pre>
 
@@ -33,9 +33,9 @@
 
 
 ###Install ElasticSearch
-_1._ Download from here http://www.elasticsearch.org/overview/elasticsearch/ and unzip
-_2._ Run  `/install/elasticsearch-0.19.0.RC1/bin/elasticsearch -f`
-_3._ Check in the browser 'http://localhost:9200/` or `curl -X GET http://localhost:9200/`
+__1.__ Download from here http://www.elasticsearch.org/overview/elasticsearch/ and unzip.
+__2.__ Run  `/install/elasticsearch-0.19.0.RC1/bin/elasticsearch -f`
+__3.__ Check in the browser `http://localhost:9200/` or `curl -X GET http://localhost:9200/`
 
 ###Set CronJob to add new sql data to the ES database ( once per day? )
 `0 0 * * * php /www/zend/public/index.php esbulkactions`
