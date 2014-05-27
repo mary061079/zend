@@ -93,7 +93,7 @@ class fetchData implements InputFilterAwareInterface {
 							            array(
 								            'encoding' => 'UTF-8',
                                             'min'      => 1,
-                                            'max'      => 100
+                                            'max'      => 1000
 							            )
 						            ),
 				            )

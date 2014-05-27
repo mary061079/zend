@@ -15,7 +15,7 @@ use Zend\Console\Request as ConsoleRequest;
 
 
 class BulkActionsController extends AbstractActionController {
-    protected $esActions, $log_file;
+    protected $esActions;
 
     public function __construct() {
         $this->log_file = '/path/to/file';
@@ -24,15 +24,19 @@ class BulkActionsController extends AbstractActionController {
     public function indexAction() {
         $request = $this->getRequest();
         $mode = $request->getParam( 'mode' );
+
         switch( $mode ) {
             case 'update':
                 $this->updateRecords();
+	            break;
 
             case 'delete':
                 $this->deleteRecords();
+	            break;
 
             default:
                 $this->bulkInsert();
+                break;
         }
     }
 
@@ -40,19 +44,23 @@ class BulkActionsController extends AbstractActionController {
         try {
             $this->esActions()->bulkUpdate();
         } catch( \Exception $e ) {
-            $this->log_info( $e->getMessage() );
+	        $this->esActions()->log_info( $e->getMessage() );
         };
     }
 
     public function deleteRecords() {
-        echo 'delete';
+	    try {
+		    $this->esActions()->bulkDelete();
+	    } catch( \Exception $e ) {
+		    $this->esActions()->log_info( $e->getMessage() );
+	    };
     }
 
     public function bulkInsert() {
         try {
 	        $this->esActions()->bulkInsert();
         } catch( \Exception $e ) {
-	        $this->log_info( $e->getMessage() );
+	        $this->esActions()->log_info( $e->getMessage() );
         };
     }
 
@@ -63,14 +71,4 @@ class BulkActionsController extends AbstractActionController {
 	    }
         return $this->esActions;
     }
-
-	public function log_info( $info ) {
-		echo  date( 'Y-m-d H:i:s' ) . "\n".$info; die;
-		if ( strlen( $info ) > 0 ) {
-			$f = fopen( $this->log_file, 'a' );
-			$date = date( 'Y-m-d H:i:s' ) . "\n";
-			fwrite( $f, $date . $info . "\n" );
-			fclose( $f );
-		}
-	}
 }

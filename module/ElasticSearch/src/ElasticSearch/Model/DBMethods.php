@@ -3,6 +3,7 @@ namespace ElasticSearch\Model;
 
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Sql\Sql;
+use Zend\Db\ResultSet\ResultSet;
 use Zend\I18n\Translator\Translator;
 
 class DBMethods {
@@ -42,8 +43,12 @@ class DBMethods {
      * @throws \Exception
      */
     public function getLatestComments() {
-	    $cron_info = $this->getCronInfo();
-	    $last_id_added =  count( $cron_info ) ? $cron_info->cron_value : 0;
+	    try{
+		    $cron_info = $this->getCronInfo();
+	    } catch( \Exception $e ) {
+		    throw new \Exception( $e->getMessage() );
+	    }
+	    $last_id_added =  $cron_info ? $cron_info->cron_value : 0;
         $select = $this->sql->select();
         $select->from($this->tableGateway->table);
 
@@ -60,11 +65,15 @@ class DBMethods {
 	 * Getting all updated comments
 	 */
 	public function getUpdatedComments() {
-		$cron_info = $this->getCronInfo();
+		try{
+			$cron_info = $this->getCronInfo();
+		} catch( \Exception $e ) {
+			throw new \Exception( $e->getMessage() );
+		}
 		$cron_date =  $cron_info ? $cron_info->date : date( 'Y-m-d H:i:s' );
 		$select = $this->sql->select()
-        ->from($this->tableGateway->table)
-        ->where->greaterThan( 'updated', $cron_date );
+        ->from($this->tableGateway->table);
+        $select->where->greaterThan( 'updated', $cron_date );
         $statement = $this->sql->prepareStatementForSqlObject($select);
         $comments = $statement->execute();
 
@@ -74,6 +83,11 @@ class DBMethods {
 		return $comments;
 	}
 
+	/**
+	 * Update cron date and last inserted id each time the cron runs
+	 *
+	 * @param $last_inserted_id
+	 */
 	public function updateCronInfo( $last_inserted_id ) {
 		$date = date( 'Y-m-d H:i:s' );
 		$this->tableGateway->adapter->query(
@@ -84,6 +98,21 @@ class DBMethods {
 			array( 'es_cron', $last_inserted_id, $date, $last_inserted_id, $date )
 		);
 	}
+
+	/**
+	 *
+	 * @return array|\ArrayObject|null
+	 */
+	public function getCommentsForDelete() {
+		$select = $this->sql->select()
+        ->from('options');
+		$select->columns( array( 'option_value' ) );
+		$select->where->equalTo( 'option_name', 'deleted_comments' );
+		$statement = $this->sql->prepareStatementForSqlObject($select);
+		$queue = $statement->execute();
+		return $queue;
+	}
+
 	/**
 	 * Getting info about last run of the cronjob
 	 */
@@ -99,6 +128,8 @@ class DBMethods {
         } catch( \Exception $e ) {
             throw new \Exception( $e->getMessage() );
         }
-        return $result;
-	}
+		$rowset = new ResultSet();
+		$rowset->initialize($result);
+		return $rowset->current();
+    }
 }

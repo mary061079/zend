@@ -29,7 +29,6 @@ class CommentsData {
 
 	}
 
-
 	public function fetchAll() {
 		/**
 		 * if we use tableGateway class instead of adapter, we also can set a direct query with this:
@@ -76,7 +75,32 @@ class CommentsData {
 		}
 	}
 
+	/**
+	 * Creating a list of ids for deleting from ES database. Didn't find a better way to note each id into the list
+	 * and save into the cron table on delete event
+	 * TODO: need to think how to implement some hooking system, dind of this:
+	 * http://www.php.net/manual/en/functions.anonymous.php. May be use globals??
+	 *
+	 * @param $delete_id
+	 */
+	public function formDeleteQueue( $delete_id ) {
+		$date = date( 'Y-m-d H:i:s' );
+		$this->tableGateway->adapter->query(
+            'INSERT INTO options (option_name, option_value, date)
+			VALUES(?, ?, ?)
+			ON DUPLICATE KEY UPDATE
+			option_value = concat(option_value, ",?"), date = ?',
+            array( 'deleted_comments', $delete_id, $date, $delete_id, $date )
+		);
+	}
+
+	/**
+	 * Delete a comment
+	 *
+	 * @param $id
+	 */
 	public function deleteComment( $id ) {
 		$this->tableGateway->delete( array( 'id' => $id ) );
+		$this->formDeleteQueue( $id );
 	}
 }

@@ -26,7 +26,6 @@ return array(
     /**
      * console application to manage bulk add/delete/update indexes in Elastic Search
      *
-     * php /var/www/zend/public/index.php esbulkactions add
      * php /var/www/zend/public/index.php esbulkactions update
      * php /var/www/zend/public/index.php esbulkactions delete
      */
