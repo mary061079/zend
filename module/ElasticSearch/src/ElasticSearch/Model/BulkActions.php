@@ -57,7 +57,12 @@ class BulkActions {
 		if ( !$queue ) {
 			return;
 		}
-		$client = new Client( 'http://localhost:9200/twitter/tweet/_query?q=id:' . $queue->option_value );
+		$client = new Client( 'http://zend:9200/zend/comment/_query?q=id:' . $queue->option_value );
+		curl -XDELETE 'http://localhost:9200/_all/_query' -d '{
+            "terms": {
+                "_id": ["1","2","3"]
+            }
+        }'
         $client->setMethod('DELETE');
         $client->setAdapter(new Curl());
         $client->send();
