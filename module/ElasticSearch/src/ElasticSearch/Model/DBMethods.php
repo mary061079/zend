@@ -9,7 +9,7 @@ use Zend\I18n\Translator\Translator;
 class DBMethods {
 	public $tableGateway, $translator, $cache, $sql;
     public function __construct( TableGateway $ESTableGateway ) {
-	    $translator = new Translator();
+	    $this->translator = new Translator();
         $this->tableGateway = $ESTableGateway;
         $this->sql = new Sql($this->tableGateway->adapter);
 
@@ -53,9 +53,12 @@ class DBMethods {
         $select->from($this->tableGateway->table);
 
         $select->where->greaterThan( 'id', $last_id_added );
-        $statement = $this->sql->prepareStatementForSqlObject($select);
-        $comments = $statement->execute();
-        if ( !$comments ) {
+        $statement = $this->sql->prepareStatementForSqlObject($select)->execute();
+
+        $result = new ResultSet();
+        $result->initialize( $statement );
+        $comments = $result->toArray( $statement );
+        if ( empty( $comments ) ) {
             throw new \Exception( $this->translator->translate( 'No comments found' ) );
         }
         return $comments;
@@ -74,10 +77,12 @@ class DBMethods {
 		$select = $this->sql->select()
         ->from($this->tableGateway->table);
         $select->where->greaterThan( 'updated', $cron_date );
-        $statement = $this->sql->prepareStatementForSqlObject($select);
-        $comments = $statement->execute();
+        $statement = $this->sql->prepareStatementForSqlObject($select)->execute();
 
-        if ( !$comments ) {
+        $result = new ResultSet();
+        $result->initialize( $statement );
+        $comments = $result->toArray( $statement );
+        if ( !empty( $comments ) ) {
 			throw new \Exception( $this->translator->translate( 'No new comments found' ) );
 		}
 		return $comments;

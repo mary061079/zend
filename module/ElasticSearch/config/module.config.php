@@ -1,5 +1,6 @@
 <?php
 // module/ElasticSearch/conﬁg/module.config.php:
+//http://localhost:9200/zend/comment/_search?q=comment:something
 
 return array(
     'router' => array(

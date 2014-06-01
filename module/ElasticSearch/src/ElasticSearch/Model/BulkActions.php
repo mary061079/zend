@@ -60,50 +60,36 @@ class BulkActions {
 		if ( !$queue ) {
 			return;
 		}
-        $uri = 'http://zend:9200/_all/_query';
-		$client = new Client( $uri );
+        $url = 'http://zend:9200/_all/_query';
 		$json = '{
                     "terms": {
                         "_id": [' . $queue->option_value . ']
                     }
                 }
         ';
-
-        $client->setAdapter(new Curl());
-        $adapter = $client->getAdapter();
-
-        $adapter->connect('zend', 9200);
-//        $uri = $client->getUri().'?id=1'; //send parameter id = 1
-//        // send with DELETE Method
-        $adapter->write('DELETE', new \Zend\Uri\Uri($uri), 1.1, array());
-
-
-
-        $client->setRawBody($json);
-        $client->setHeaders(
-            array(
-                'Content-Type: application/json',
-            )
-        );
-
-        //$client->send();
-        //if we didn't receive a correct response
-        $adapter->read();
-        //$response = $this->getResponse();
-        $response = $client->getResponse();
-        if ( $response->getStatusCode() != 200 ) {
-	        throw new \Exception( __METHOD__ . ":\n" . $response->getContent() );
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $if_deleted = json_decode( $result );
+        if ( !$if_deleted ) {
+	        throw new \Exception( __METHOD__ . ":\n" . 'Error in curl processing' );
         }
+        foreach($if_deleted->_indices->zend as $shard ) {
+            if ( $shard->failed != 0 ) {
+                $this->log_info( __METHOD__ . ":\n delete failed" );
+            }
+        }
+
         //delete the queue
-        $this->db->tableGateway->delete( array('option_name', 'deleted_comments') );
-//        $json = json_decode( $response->getContent() );
-//
-//
-//        // if somehow we received the wrong format of the response
-//        if ( !$json ) {
-//	        throw new \Exception( __METHOD__ . ":\n" . $response->getContent() );
-//        }
-	}
+        $this->db->tableGateway->adapter->query(
+            "DELETE from options where option_name = 'deleted_comments'",
+            array()
+        );
+  	}
 
 	/**
 	 * Process any bulk request.
@@ -122,18 +108,19 @@ class BulkActions {
                 $comments = $this->db->getLatestComments();
             }
         } catch( \Exception $e ) {
-            throw new \Exception( __METHOD__ . ":\n" . $e->getMessage() );
+            throw new \Exception( __METHOD__ . ":\n" . $e->getMessage() . "\n" );
         }
-        if ( !$comments ) {
+        if ( empty( $comments ) ) {
             throw new \Exception( __METHOD__ . ":\n" . 'No comments found' );
         }
         $json = '';
 
         foreach( $comments as $comment ) {
-            var_dump($comment);die;
-            $json .= sprintf( $json_request, $comment['id'], $comment['email'], $comment['comment'], $comment['created'], $comment['updated'] );
+            $json .= sprintf( $json_request, $comment['id'], $comment['email'],
+                str_replace("\'", "'",mysql_real_escape_string( $comment['comment'] )), $comment['created'], $comment['updated'] );
 	        $last_id = $comment['id'];
         }
+        //var_dump($json, "\n\n" );die;
 		// if we have $action = 'update' we should not update last id, only date, that's why we give $last_added_id an
 		// old value.
 		$last_id = $last_added_id != 0 ? $last_added_id : $last_id;
@@ -169,6 +156,7 @@ class BulkActions {
                 $errors .= $item->create->error . "\n";
             }
         }
+
         if ( strlen( $errors ) > 0 ) {
             $this->log_info( __METHOD__ . ":\n" . $errors );
         }

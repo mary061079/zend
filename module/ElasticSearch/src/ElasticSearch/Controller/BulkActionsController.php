@@ -4,6 +4,10 @@
  * cd /var/www/zend/public
  * php index.php update
  */
+/*
+ * searching
+ * http://localhost:9200/zend/comment/_search?q=comment:whatsearch
+ */
 
 namespace ElasticSearch\Controller;
 
