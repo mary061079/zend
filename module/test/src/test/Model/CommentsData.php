@@ -85,11 +85,12 @@ class CommentsData {
 	 */
 	public function formDeleteQueue( $delete_id ) {
 		$date = date( 'Y-m-d H:i:s' );
-		$this->tableGateway->adapter->query(
+        $this->tableGateway->adapter->query(
             "INSERT INTO options (option_name, option_value, date)
-			VALUES('deleted_comments', $delete_id, '$date')
+			VALUES('deleted_comments', ?, ?)
 			ON DUPLICATE KEY UPDATE
-			option_value = concat(option_value, ',$delete_id'), date = '$date'"
+			option_value = concat(option_value, ',$delete_id'), date = '$date'",
+            array($delete_id, $date)
         );
 	}
 
@@ -99,7 +100,7 @@ class CommentsData {
 	 * @param $id
 	 */
 	public function deleteComment( $id ) {
-		//$this->tableGateway->delete( array( 'id' => $id ) );
-		var_dump($this->formDeleteQueue( $id ));
+		$this->tableGateway->delete( array( 'id' => $id ) );
+		$this->formDeleteQueue( $id );
 	}
 }

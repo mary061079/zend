@@ -110,7 +110,7 @@ class testController extends AbstractActionController
 	public function deleteAction() {
         $id = (int) $this->params()->fromRoute('id', 0);
         $this->getCommentsData()->deleteComment( $id );
-       // $this->redirect()->toRoute( 'test' );
+        $this->redirect()->toRoute( 'test' );
 	}
 
 	public function getCommentsData() {
