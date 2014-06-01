@@ -109,8 +109,14 @@ class DBMethods {
 		$select->columns( array( 'option_value' ) );
 		$select->where->equalTo( 'option_name', 'deleted_comments' );
 		$statement = $this->sql->prepareStatementForSqlObject($select);
-		$queue = $statement->execute();
-		return $queue;
+		try {
+            $queue = $statement->execute();
+        } catch( \Exception $e ) {
+            throw new \Exception( $e->getMessage() );
+        }
+        $rowset = new ResultSet();
+        $rowset->initialize($queue);
+        return $rowset->current();
 	}
 
 	/**

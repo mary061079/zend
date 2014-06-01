@@ -30,6 +30,7 @@ class BulkActions {
 
     /**
      * Update all coupons if available for update
+     * php /var/www/zend/public/index.php esbulkactions update
      */
     public function bulkUpdate() {
         try{
@@ -49,21 +50,30 @@ class BulkActions {
 
 	/**
 	 * Bulk delete comments
+     * php /var/www/zend/public/index.php esbulkactions delete
 	 *
 	 * @throws \Exception
 	 */
 	public function bulkDelete() {
 		$queue = $this->db->getCommentsForDelete();
+        var_dump($queue);
 		if ( !$queue ) {
 			return;
 		}
-		$client = new Client( 'http://zend:9200/zend/comment/_query?q=id:' . $queue->option_value );
-		curl -XDELETE 'http://localhost:9200/_all/_query' -d '{
-            "terms": {
-                "_id": ["1","2","3"]
-            }
-        }'
+		$client = new Client( 'http://localhost:9200/_all/_query' );
+		$json = '{
+                    "terms": {
+                        "_id": [' . $queue->option_value . ']
+                    }
+                }
+        ';
         $client->setMethod('DELETE');
+        $client->setRawBody($json);
+        $client->setHeaders(
+            array(
+                'Content-Type: application/json',
+            )
+        );
         $client->setAdapter(new Curl());
         $client->send();
         //if we didn't receive a correct response
