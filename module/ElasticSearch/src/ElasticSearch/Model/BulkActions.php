@@ -128,7 +128,9 @@ class BulkActions {
             throw new \Exception( __METHOD__ . ":\n" . 'No comments found' );
         }
         $json = '';
+
         foreach( $comments as $comment ) {
+            var_dump($comment);die;
             $json .= sprintf( $json_request, $comment['id'], $comment['email'], $comment['comment'], $comment['created'], $comment['updated'] );
 	        $last_id = $comment['id'];
         }

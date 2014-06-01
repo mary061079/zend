@@ -56,3 +56,7 @@ __3.__ Check in the browser `http://localhost:9200/` or `curl -X GET http://loca
 
 ###Set CronJob to add new sql data to the ES database ( once per day? )
 `0 0 * * * php /www/zend/public/index.php esbulkactions`
+
+###Make search in ES
+http://localhost:9200/zend/_search?pretty=true
+where zend is `index` of the blog and `pretty` is a type
