@@ -56,38 +56,53 @@ class BulkActions {
 	 */
 	public function bulkDelete() {
 		$queue = $this->db->getCommentsForDelete();
-        var_dump($queue);
+
 		if ( !$queue ) {
 			return;
 		}
-		$client = new Client( 'http://localhost:9200/_all/_query' );
+        $uri = 'http://zend:9200/_all/_query';
+		$client = new Client( $uri );
 		$json = '{
                     "terms": {
                         "_id": [' . $queue->option_value . ']
                     }
                 }
         ';
-        $client->setMethod('DELETE');
+
+        $client->setAdapter(new Curl());
+        $adapter = $client->getAdapter();
+
+        $adapter->connect('zend', 9200);
+//        $uri = $client->getUri().'?id=1'; //send parameter id = 1
+//        // send with DELETE Method
+        $adapter->write('DELETE', new \Zend\Uri\Uri($uri), 1.1, array());
+
+
+
         $client->setRawBody($json);
         $client->setHeaders(
             array(
                 'Content-Type: application/json',
             )
         );
-        $client->setAdapter(new Curl());
-        $client->send();
-        //if we didn't receive a correct response
 
+        //$client->send();
+        //if we didn't receive a correct response
+        $adapter->read();
+        //$response = $this->getResponse();
         $response = $client->getResponse();
         if ( $response->getStatusCode() != 200 ) {
 	        throw new \Exception( __METHOD__ . ":\n" . $response->getContent() );
         }
-        $json = json_decode( $response->getContent() );
-
-        // if somehow we received the wrong format of the response
-        if ( !$json ) {
-	        throw new \Exception( __METHOD__ . ":\n" . $response->getContent() );
-        }
+        //delete the queue
+        $this->db->tableGateway->delete( array('option_name', 'deleted_comments') );
+//        $json = json_decode( $response->getContent() );
+//
+//
+//        // if somehow we received the wrong format of the response
+//        if ( !$json ) {
+//	        throw new \Exception( __METHOD__ . ":\n" . $response->getContent() );
+//        }
 	}
 
 	/**
