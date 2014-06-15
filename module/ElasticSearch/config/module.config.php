@@ -9,7 +9,7 @@ return array(
             'search' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/search[/][:action][/:id]',
+                    'route'    => '/search[/][:action][/:page][/:id]',
                     'constraints' => array(
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
@@ -18,6 +18,7 @@ return array(
                         'controller'    => 'ElasticSearch\Controller\ElasticSearch',
                         'action'        => 'index',
                     ),
+                    'posts_per_page' => 2
                 ),
                 'may_terminate' => true,
 

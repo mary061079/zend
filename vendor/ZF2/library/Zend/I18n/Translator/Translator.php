@@ -36,7 +36,7 @@ class Translator
     const EVENT_NO_MESSAGES_LOADED = 'noMessagesLoaded';
 
     /**
-     * Messages loaded by the translator.
+     * Messages loaded by ranhe translator.
      *
      * @var array
      */

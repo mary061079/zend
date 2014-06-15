@@ -1,7 +1,8 @@
 <?php
 namespace ElasticSearch\Model;
 
-class SearchResults {
+use Zend\View\Model\ViewModel;
+class SearchResults{
     public $post;
 
     public function __construct( $post ) {
