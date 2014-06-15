@@ -3,6 +3,7 @@ $title = $this->translate( 'Elastic Search' );
 $this->headTitle( $title );?>
     <h1><?php echo $this->escapeHtml( $title ) ?></h1>
 <?php $form->setAttribute( 'action', $this->url( 'search', array( 'action' => 'search' ) ) );
+$form->setAttribute( 'method', 'get');
 $form->prepare();
 //instead of per-line implementation we can use the entire form function display:
 echo $this->form()->openTag( $form );

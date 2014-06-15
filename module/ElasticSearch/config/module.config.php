@@ -9,14 +9,14 @@ return array(
             'search' => array(
                 'type'    => 'segment',
                 'options' => array(
-                    'route'    => '/search[/][:action][/:page][/:id]',
+                    'route'    => '/search[/][/:page][/:id]',
                     'constraints' => array(
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id'     => '[0-9]+',
                     ),
                     'defaults' => array(
                         'controller'    => 'ElasticSearch\Controller\ElasticSearch',
-                        'action'        => 'index',
+                        'action'        => 'search',
                     ),
                     'posts_per_page' => 2
                 ),

@@ -20,7 +20,7 @@ class SearchForm extends Form {
 			     'name' => 'submit',
 			     'type' => 'submit',
 		         'attributes' => array(
-			         'value' => 'Seach',
+                     'value' => 'Seach',
 		             'id' => 'submit'
 		         )
 		     )

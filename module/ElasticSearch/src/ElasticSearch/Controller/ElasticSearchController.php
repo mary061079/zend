@@ -7,8 +7,6 @@ use ElasticSearch\Model\SearchResults;
 use ElasticSearch\Form\SearchForm;
 use Zend\Http\Client;
 use Zend\Http\Client\Adapter\Curl;
-use Zend\I18n\Translator\Translator;
-
 
 class ElasticSearchController extends AbstractActionController
 {
@@ -30,27 +28,26 @@ class ElasticSearchController extends AbstractActionController
      */
     public function searchAction() {
         $request = $this->getRequest();
-        if ( $request->isPost() || $request->isGet() ) {
+        if ( $request->isGet() ) {
             $form = new SearchForm();
             $form->setInputFilter( $form->getInputFilter() );
             $form->setData( $request->getPost() );
+
             if ( $form->isValid() ) {
-                $search = new SearchResults( $request->getRequest( 'search' ) );
+                $search = new SearchResults( $request->getQuery( 'search' ) );
             }
-//            if ( $request->isGet() ) {
-//                $page =
-//            }
             $config = $this->getServiceLocator()->get('Config');
             $this->postsPerPage = $config['router']['routes']['search']['options']['posts_per_page'];
 
             $client = new Client( 'http://zend:9200/zend/comment/_search?q=comment:' . $search->post .
-                '&from=' . $this->params()->fromRoute( 'page', 0 ) .
+                '&from=' . $this->params()->fromRoute( 'id', 0 ) .
                 '&size=' . $this->postsPerPage );
             $client->setAdapter(new Curl());
             $client->send();
             $response = $client->getResponse();
             if ( $response->getStatusCode() != 200 ) {
-                return array( 'response' => $response->getContent() );
+                $json = json_decode( $response->getContent() );
+                return array( 'response' => $json->error );
             }
             $json = json_decode( $response->getContent() );
 
@@ -61,18 +58,18 @@ class ElasticSearchController extends AbstractActionController
             $view = array(
                 'response' => $json,
                 'query' => $search->post,
-                'translate' => new Translator(),
+                'pagination' => array()
             );
             if ( $json->hits->total > $this->postsPerPage ) {
-                $view['pagination'] =  array(
-                    'total' => $json->hits->total,
-                    'current' => $this->params()->fromRoute( 'page', 1 ),
-                    'posts_per_page' => $this->postsPerPage
+                $view['pagination'] = array(
+                        'total' => $json->hits->total,
+                        'current' => $this->params()->fromRoute( 'id', 1 ),
+                        'posts_per_page' => $this->postsPerPage
                 );
             }
             return $view;
         } else {
-            $this->redirect()->toRoute( 'search' );
+            $this->redirect()->toRoute( '/' );
         }
     }
 }
